@@ -1,66 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 
-<AnchorPane prefHeight="610.0" prefWidth="460.0" stylesheets="@MainWindowStyle.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.MainWindowController">
+<AnchorPane fx:id="mainFrame" prefHeight="400.0" prefWidth="550.0" stylesheets="@MainWindowStyle.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.MainWindowController">
    <children>
-      <Pane fx:id="titlePane" prefHeight="72.0" prefWidth="460.0">
+      <Pane fx:id="titlePane" prefHeight="72.0" prefWidth="550.0">
          <children>
             <Label fx:id="settingsLabel" layoutX="31.0" layoutY="26.0" text="SETTINGS" />
             <Label fx:id="inputLabel" layoutX="31.0" layoutY="26.0" text="INPUT" />
             <Label fx:id="subnetsLabel" layoutX="31.0" layoutY="26.0" text="SUBNETS LIST" />
          </children>
       </Pane>
-      <AnchorPane fx:id="fieldFrame" layoutY="73.0" prefHeight="537.0" prefWidth="460.0">
+      <AnchorPane fx:id="settingsFrame" layoutY="73.0" prefHeight="400.0" prefWidth="532.0">
          <children>
-            <Pane prefHeight="537.0" prefWidth="460.0" styleClass="mainPane">
-               <children>
-                  <ProgressBar layoutX="121.0" layoutY="429.0" prefWidth="200.0" progress="0.0" />
-               </children>
-            </Pane>
-            <TextField focusTraversable="false" layoutX="50.0" layoutY="101.0" />
-            <TextField focusTraversable="false" layoutX="50.0" layoutY="211.0" />
-            <TextField focusTraversable="false" layoutX="274.0" layoutY="211.0" />
-            <TextField focusTraversable="false" layoutX="49.0" layoutY="323.0" />
-            <TextField focusTraversable="false" layoutX="274.0" layoutY="322.0" />
-            <Label layoutX="50.0" layoutY="82.0" text="IP ADDRESS" />
-            <Label layoutX="274.0" layoutY="82.0" text="SUBNET MASK" />
-            <Label layoutX="50.0" layoutY="191.0" text="SUBNETS' NUMBER" />
-            <Label layoutX="274.0" layoutY="192.0" text="HOSTS' NUMBER" />
-            <ChoiceBox layoutX="274.0" layoutY="101.0" prefWidth="150.0" />
-         </children>
-      </AnchorPane>
-      <AnchorPane fx:id="addressFrame" layoutY="73.0" prefHeight="537.0" prefWidth="460.0">
-         <children>
-            <Pane prefHeight="537.0" prefWidth="460.0" styleClass="mainPane" />
-            <TableView fx:id="table" layoutX="20.0" prefHeight="537.0" prefWidth="420.0" stylesheets="@MainWindowStyle.css">
-              <columns>
-                <TableColumn prefWidth="139.33334350585938" text="SUBNET" />
-                <TableColumn prefWidth="182.66665649414062" text="VALID HOST RANGE" />
-                  <TableColumn prefWidth="96.0" text="BROADCAST" />
-              </columns>
-            </TableView>
-         </children>
-      </AnchorPane>
-      <AnchorPane fx:id="settingsFrame" layoutY="73.0" prefHeight="537.0" prefWidth="460.0">
-         <children>
-            <Pane prefHeight="537.0" prefWidth="460.0" styleClass="mainPane">
+            <Pane prefHeight="400.0" prefWidth="550.0" styleClass="mainPane">
                <children>
                   <ColorPicker layoutX="24.0" layoutY="74.0" />
                   <ToggleButton layoutX="27.0" layoutY="140.0" mnemonicParsing="false" text="ToggleButton" />
                </children>
             </Pane>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="addressFrame" layoutY="73.0" prefHeight="400.0" prefWidth="550.0">
+         <children>
+            <Pane prefHeight="400.0" prefWidth="550.0" styleClass="mainPane" />
+            <TableView fx:id="table" layoutX="5.0" prefHeight="400.0" prefWidth="540.0" stylesheets="@MainWindowStyle.css">
+              <columns>
+                <TableColumn prefWidth="66.0" text="SUBNET ID" />
+                  <TableColumn prefWidth="135.0" text="SUBNET ADDRESS" />
+                <TableColumn prefWidth="178.0" text="HOST RANGE" />
+                  <TableColumn prefWidth="160.0" text="BROADCAST ID" />
+              </columns>
+            </TableView>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="fieldFrame" layoutY="73.0" prefHeight="400.0" prefWidth="532.0">
+         <children>
+            <Pane prefHeight="400.0" prefWidth="550.0" styleClass="mainPane">
+               <children>
+                  <ProgressBar layoutX="47.0" layoutY="320.0" prefHeight="18.0" prefWidth="373.0" progress="0.0" />
+                  <Slider layoutX="45.0" layoutY="300.0" prefHeight="14.0" prefWidth="379.0" />
+                  <RadioButton fx:id="flsmMode" layoutX="169.0" layoutY="18.0" mnemonicParsing="false" selected="true" text="FLSM" textFill="WHITE">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="subnettingMode" />
+                     </toggleGroup></RadioButton>
+                  <RadioButton fx:id="vlsmMode" layoutX="240.0" layoutY="18.0" mnemonicParsing="false" text="VLSM" textFill="WHITE" toggleGroup="$subnettingMode" />
+                  <Spinner layoutX="275.0" layoutY="85.0" />
+                  <Spinner layoutX="47.0" layoutY="168.0" />
+                  <Spinner layoutX="275.0" layoutY="168.0" />
+                  <Button layoutX="198.0" layoutY="230.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="74.0" text="ADD" />
+               </children>
+            </Pane>
+            <TextField focusTraversable="false" layoutX="50.0" layoutY="84.0" />
+            <Label layoutX="50.0" layoutY="65.0" text="IP ADDRESS" />
+            <Label layoutX="274.0" layoutY="65.0" text="SUBNET MASK" />
+            <Label layoutX="50.0" layoutY="149.0" text="SUBNETS' NUMBER" />
+            <Label layoutX="274.0" layoutY="150.0" text="HOSTS' NUMBER" />
          </children>
       </AnchorPane>
       <Pane prefHeight="73.0" prefWidth="85.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -77,14 +87,14 @@
             </ImageView>
          </children>
       </Pane>
-      <Pane layoutX="158.0" prefHeight="72.0" prefWidth="137.0">
+      <Pane layoutX="190.0" prefHeight="72.0" prefWidth="137.0">
          <children>
             <ImageView fx:id="firstPage" fitHeight="32.0" fitWidth="32.0" layoutX="-3.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../resources/1frame.png" />
                </image>
             </ImageView>
-            <ImageView fx:id="secondPage" fitHeight="32.0" fitWidth="32.0" layoutX="52.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="secondPage" fitHeight="32.0" fitWidth="32.0" layoutX="52.0" layoutY="21.0" onMouseClicked="#openSecondPage" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../resources/2frame.png" />
                </image>

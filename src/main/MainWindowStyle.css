@@ -30,7 +30,7 @@
    to the edge of the tableview, or up to the 'column control' button. */
 .table-view .filler, .tree-table-view .filler, .table-view .column-header,
 .tree-table-view .column-header {
-    -fx-size: 60;
+    -fx-size: 30;
     -fx-border-style: null;
     -fx-border-color: #333;
     -fx-border-width: 0 0 2 0;
@@ -40,13 +40,6 @@
 .table-view .show-hide-columns-button, .tree-table-view .show-hide-columns-button
 {
     -fx-background-color: transparent;
-}
-
-.table-view .column-header .label, .table-view .filler .label,
-.table-view .column-drag-header .label, .tree-table-view .column-header .label,
-.tree-table-view .filler .label, .tree-table-view .column-drag-header .label
-{
-    -fx-alignment: CENTER_LEFT;
 }
 
 /*.table-view .column-header-background, .tree-table-view .column-header-background
