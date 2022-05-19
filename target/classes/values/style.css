@@ -21,9 +21,11 @@
     -fx-background-color: #333;
 }
 
+
 .label {
 -fx-text-fill: white;
 }
+
 
 /* The column header row is made up of a number of column-header, one for each
    TableColumn, and a 'filler' area that extends from the right-most column
@@ -35,12 +37,14 @@
     -fx-border-color: #333;
     -fx-border-width: 0 0 2 0;
     -fx-background-color: transparent;
+
 }
 
 .table-view .show-hide-columns-button, .tree-table-view .show-hide-columns-button
 {
     -fx-background-color: transparent;
 }
+
 
 /*.table-view .column-header-background, .tree-table-view .column-header-background
 {
