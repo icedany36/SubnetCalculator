@@ -36,6 +36,19 @@
             </Pane>
          </children>
       </AnchorPane>
+      <AnchorPane fx:id="addressFrame" layoutY="73.0" prefHeight="400.0" prefWidth="550.0">
+         <children>
+            <Pane prefHeight="400.0" prefWidth="550.0" styleClass="mainPane" />
+            <TableView fx:id="table" layoutX="5.0" prefHeight="400.0" prefWidth="536.0" stylesheets="@../values/whiteLabel.css">
+              <columns>
+                <TableColumn fx:id="c1" prefWidth="61.0" text="ID" />
+                  <TableColumn fx:id="c2" prefWidth="98.0" text="ADDRESS" />
+                <TableColumn fx:id="c3" prefWidth="240.0" text="HOST RANGE" />
+                  <TableColumn fx:id="c4" prefWidth="129.0" text="BROADCAST" />
+              </columns>
+            </TableView>
+         </children>
+      </AnchorPane>
       <AnchorPane fx:id="fieldFrame" layoutY="73.0" prefHeight="400.0" prefWidth="532.0">
          <children>
             <Pane fx:id="firstPane" prefHeight="400.0" prefWidth="550.0" styleClass="mainPane">
@@ -50,7 +63,7 @@
                   <Button fx:id="addBtn" layoutX="49.0" layoutY="339.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="74.0" text="ADD" />
                   <Button fx:id="addBtn1" layoutX="350.0" layoutY="339.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="74.0" text="RESET" />
                   <Label layoutX="52.0" layoutY="61.0" text="IP ADDRESS" />
-                  <Label layoutX="271.0" layoutY="61.0" text="CIDR" />
+                  <Label layoutX="271.0" layoutY="61.0" text="SUBNET MASK" />
                   <Label layoutX="50.0" layoutY="132.0" text="SUBNETS' NUMBER" />
                   <Label layoutX="271.0" layoutY="132.0" text="HOSTS' NUMBER" />
                </children>
@@ -59,19 +72,6 @@
             <ChoiceBox fx:id="cidr" layoutX="270.0" layoutY="82.0" prefWidth="150.0" stylesheets="@../values/blackLabel.css" />
             <ChoiceBox fx:id="subnetsNumber" layoutX="48.0" layoutY="153.0" prefWidth="150.0" stylesheets="@../values/blackLabel.css" />
             <TextField fx:id="IPAddress" focusTraversable="false" layoutX="50.0" layoutY="84.0" />
-         </children>
-      </AnchorPane>
-      <AnchorPane fx:id="addressFrame" layoutY="73.0" prefHeight="400.0" prefWidth="550.0">
-         <children>
-            <Pane prefHeight="400.0" prefWidth="550.0" styleClass="mainPane" />
-            <TableView fx:id="table" layoutX="5.0" prefHeight="400.0" prefWidth="536.0" stylesheets="@../values/whiteLabel.css">
-              <columns>
-                <TableColumn fx:id="c1" prefWidth="61.0" text="ID" />
-                  <TableColumn fx:id="c2" prefWidth="98.0" text="ADDRESS" />
-                <TableColumn fx:id="c3" prefWidth="240.0" text="HOST RANGE" />
-                  <TableColumn fx:id="c4" prefWidth="129.0" text="BROADCAST" />
-              </columns>
-            </TableView>
          </children>
       </AnchorPane>
       <Pane prefHeight="73.0" prefWidth="85.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
