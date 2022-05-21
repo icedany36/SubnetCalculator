@@ -20,6 +20,7 @@ public class Main extends Application {
         Scene scene = new Scene(loader.load());
         stage.setScene(scene);
         scene.setFill(Color.TRANSPARENT);
+        scene.getStylesheets().add("values/style.css");
         stage.initStyle(StageStyle.TRANSPARENT);
         stage.setResizable(false);
         stage.setTitle("Subnet Calculator");

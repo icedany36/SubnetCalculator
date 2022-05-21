@@ -36,42 +36,42 @@
             </Pane>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="addressFrame" layoutY="73.0" prefHeight="400.0" prefWidth="550.0">
-         <children>
-            <Pane prefHeight="400.0" prefWidth="550.0" styleClass="mainPane" />
-            <TableView fx:id="table" layoutX="5.0" prefHeight="400.0" prefWidth="540.0" stylesheets="@../values/whiteLabel.css">
-              <columns>
-                <TableColumn fx:id="c1" prefWidth="66.0" text="SUBNET ID" />
-                  <TableColumn fx:id="c2" prefWidth="135.0" text="SUBNET ADDRESS" />
-                <TableColumn fx:id="c3" prefWidth="178.0" text="HOST RANGE" />
-                  <TableColumn fx:id="c4" prefWidth="160.0" text="BROADCAST ID" />
-              </columns>
-            </TableView>
-         </children>
-      </AnchorPane>
       <AnchorPane fx:id="fieldFrame" layoutY="73.0" prefHeight="400.0" prefWidth="532.0">
          <children>
-            <Pane prefHeight="400.0" prefWidth="550.0" styleClass="mainPane">
+            <Pane fx:id="firstPane" prefHeight="400.0" prefWidth="550.0" styleClass="mainPane">
                <children>
-                  <ProgressBar layoutX="50.0" layoutY="274.0" prefHeight="18.0" prefWidth="373.0" progress="0.0" />
-                  <Slider layoutX="47.0" layoutY="204.0" prefHeight="14.0" prefWidth="379.0" />
+                  <ProgressBar layoutX="50.0" layoutY="291.0" prefHeight="18.0" prefWidth="373.0" progress="0.0" />
+                  <Slider layoutX="47.0" layoutY="212.0" prefHeight="14.0" prefWidth="379.0" />
                   <RadioButton fx:id="flsmMode" layoutX="169.0" layoutY="18.0" mnemonicParsing="false" selected="true" text="FLSM" textFill="WHITE">
                      <toggleGroup>
                         <ToggleGroup fx:id="subnettingMode" />
                      </toggleGroup></RadioButton>
                   <RadioButton fx:id="vlsmMode" layoutX="240.0" layoutY="18.0" mnemonicParsing="false" text="VLSM" textFill="WHITE" toggleGroup="$subnettingMode" />
-                  <Button fx:id="addBtn" layoutX="49.0" layoutY="322.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="74.0" text="ADD" />
-                  <Button fx:id="addBtn1" layoutX="350.0" layoutY="322.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="74.0" text="RESET" />
-                  <ChoiceBox fx:id="cidr" layoutX="271.0" layoutY="84.0" prefWidth="150.0" stylesheets="@../values/blackLabel.css" />
-                  <ChoiceBox layoutX="50.0" layoutY="155.0" prefWidth="150.0" />
-                  <ChoiceBox layoutX="271.0" layoutY="155.0" prefWidth="150.0" />
+                  <Button fx:id="addBtn" layoutX="49.0" layoutY="339.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="74.0" text="ADD" />
+                  <Button fx:id="addBtn1" layoutX="350.0" layoutY="339.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="74.0" text="RESET" />
+                  <Label layoutX="52.0" layoutY="61.0" text="IP ADDRESS" />
+                  <Label layoutX="271.0" layoutY="61.0" text="CIDR" />
+                  <Label layoutX="50.0" layoutY="132.0" text="SUBNETS' NUMBER" />
+                  <Label layoutX="271.0" layoutY="132.0" text="HOSTS' NUMBER" />
                </children>
             </Pane>
+            <ChoiceBox fx:id="hostsNumber" layoutX="269.0" layoutY="151.0" prefWidth="150.0" stylesheets="@../values/blackLabel.css" />
+            <ChoiceBox fx:id="cidr" layoutX="270.0" layoutY="82.0" prefWidth="150.0" stylesheets="@../values/blackLabel.css" />
+            <ChoiceBox fx:id="subnetsNumber" layoutX="48.0" layoutY="153.0" prefWidth="150.0" stylesheets="@../values/blackLabel.css" />
             <TextField fx:id="IPAddress" focusTraversable="false" layoutX="50.0" layoutY="84.0" />
-            <Label layoutX="50.0" layoutY="65.0" text="IP ADDRESS" />
-            <Label layoutX="274.0" layoutY="65.0" text="CIDR" />
-            <Label layoutX="50.0" layoutY="135.0" text="SUBNETS' NUMBER" />
-            <Label layoutX="274.0" layoutY="136.0" text="HOSTS' NUMBER" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="addressFrame" layoutY="73.0" prefHeight="400.0" prefWidth="550.0">
+         <children>
+            <Pane prefHeight="400.0" prefWidth="550.0" styleClass="mainPane" />
+            <TableView fx:id="table" layoutX="5.0" prefHeight="400.0" prefWidth="536.0" stylesheets="@../values/whiteLabel.css">
+              <columns>
+                <TableColumn fx:id="c1" prefWidth="61.0" text="ID" />
+                  <TableColumn fx:id="c2" prefWidth="98.0" text="ADDRESS" />
+                <TableColumn fx:id="c3" prefWidth="240.0" text="HOST RANGE" />
+                  <TableColumn fx:id="c4" prefWidth="129.0" text="BROADCAST" />
+              </columns>
+            </TableView>
          </children>
       </AnchorPane>
       <Pane prefHeight="73.0" prefWidth="85.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

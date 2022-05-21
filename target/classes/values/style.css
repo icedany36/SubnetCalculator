@@ -16,6 +16,10 @@
     -fx-background-radius: 10;
 }
 
+#titlePane, #firstPane {
+-fx-font-weight:bold;
+}
+
 .column-header-background {
     -fx-background-radius: 10;
     -fx-background-color: #333;
@@ -25,7 +29,6 @@
 .label {
 -fx-text-fill: white;
 }
-
 
 /* The column header row is made up of a number of column-header, one for each
    TableColumn, and a 'filler' area that extends from the right-most column
@@ -37,7 +40,14 @@
     -fx-border-color: #333;
     -fx-border-width: 0 0 2 0;
     -fx-background-color: transparent;
+}
 
+.table-view {
+ -fx-size: 30;
+    -fx-border-style: null;
+    -fx-border-color: #333;
+    -fx-border-width: 0 0 2 0;
+    -fx-background-color: transparent;
 }
 
 .table-view .show-hide-columns-button, .tree-table-view .show-hide-columns-button
@@ -46,16 +56,43 @@
 }
 
 
-/*.table-view .column-header-background, .tree-table-view .column-header-background
+.table-view .column-header-background, .tree-table-view .column-header-background
 {
     -fx-background-color: transparent;
 }
 
 .table-row-cell, .tree-table-row-cell {
-    -fx-cell-size: 40px;
+    -fx-cell-size: 30px;
 }
 
 .table-cell {
     -fx-border-color: transparent; /* Vertical Lines*/
     -fx-border-width: 1;
-} */
+    -fx-font-size: 15px;
+}
+
+
+
+
+
+
+
+
+
+.table-row-cell {
+    -fx-background-color: #333;
+    -fx-font-weight:bold;
+    -fx-text-fill: whitesmoke;
+}
+
+
+
+.table-row-cell{
+
+    -fx-text-fill: whitesmoke;
+}
+
+.table-column {
+
+     -fx-text-fill: whitesmoke;
+}
