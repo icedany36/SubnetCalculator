@@ -33,7 +33,7 @@ public class CalculatorController {
     private Label inputLabel, subnetsLabel, settingsLabel;
 
     @FXML
-    private Button addBtn;
+    private Button addBtn, reset, submit;
 
     @FXML
     private RadioButton flsmMode, vlsmMode;
@@ -80,11 +80,13 @@ public class CalculatorController {
 
     ObservableList<Table> list;
 
-    private boolean isClassA = false, isClassB = false, isClassC = false;
+    private boolean isClassA = false, isClassB = false, isClassC = false, verify = false;
 
-    private int ID, address, address2, address3, firstHostRange, lastHostRange, broadcast;
+    private int ID, address, address2, address3, firstHostRange, lastHostRange, broadcast, count;
 
-    private String firstPart, secondPart, thirdPart;
+    private String firstPart, secondPart, thirdPart, fourthPart, first1, first2, first3;
+
+    private boolean submitVerify;
 
     /*public void enable(MouseEvent e) {
         if(e.getTarget() == vlsmMode)
@@ -113,13 +115,15 @@ public class CalculatorController {
         addBtn.setVisible(false);
 
         cidr.getItems().addAll(cidrC);
-        cidr.setValue("25");
+        cidr.setValue("0");
 
         hostsNumber.getItems().addAll(classC);
-        hostsNumber.setValue("255");
+        hostsNumber.setValue("0");
 
         subnetsNumber.getItems().addAll(classC);
-        subnetsNumber.setValue("1");
+        subnetsNumber.setValue("0");
+
+        IPAddress.setText("0.0.0.0");
 
         c1.setCellValueFactory(new PropertyValueFactory<Table, String>("c1"));
         c2.setCellValueFactory(new PropertyValueFactory<Table, String>("c2"));
@@ -148,43 +152,11 @@ public class CalculatorController {
         IPAddress.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                if (keyEvent.getCode() == KeyCode.ENTER) {
-                    if (Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 192) {
-                        cidr.getItems().setAll(cidrC);
-                        cidr.setValue("25");
+                if(keyEvent.getCode() == KeyCode.ENTER) {
+                    controller();
 
-                        hostsNumber.getItems().setAll(classC);
-                        hostsNumber.setValue("256");
-
-                        subnetsNumber.getItems().setAll(classC);
-                        subnetsNumber.setValue("1");
-
-                        isClassC = true;
-                    }
-                    else if(Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 128) {
-                        cidr.getItems().setAll(cidrB);
-                        cidr.setValue("17");
-
-                        hostsNumber.getItems().setAll(classB);
-                        hostsNumber.setValue("65536");
-
-                        subnetsNumber.getItems().setAll(classB);
-                        subnetsNumber.setValue("1");
-
-                        isClassB = true;
-                    }
-                    else if(Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 1) {
-                        cidr.getItems().setAll(cidrA);
-                        cidr.setValue("9");
-
-                        hostsNumber.getItems().setAll(classA);
-                        hostsNumber.setValue("16777216");
-
-                        subnetsNumber.getItems().setAll(classA);
-                        subnetsNumber.setValue("1");
-
-                        isClassA = true;
-                    }
+                    if(verify == true)
+                        adapter();
                 }
             }
         });
@@ -207,8 +179,25 @@ public class CalculatorController {
             fieldFrame.setVisible(false);
             addressFrame.setVisible(true);
             settingsFrame.setVisible(false);
+        });
 
-            calculation();
+        reset.setOnMouseClicked(mouseEvent -> {
+                list.clear();
+                submitVerify = false;
+        });
+
+        submit.setOnMouseClicked(mouseEvent -> {
+                controller();
+                adapter();
+
+                if(verify == true) {
+                    calculator();
+                    submitVerify = true;
+
+                    fieldFrame.setVisible(false);
+                    addressFrame.setVisible(true);
+                    settingsFrame.setVisible(false);
+                }
         });
 
         // PARTE DEL CONTROLLO AUTOMATICO
@@ -235,19 +224,46 @@ public class CalculatorController {
         btnMinimize.setOnMouseClicked(mouseEvent -> stage.setIconified(true));
     }
 
-    private void calculation() {
+    private void adapter() {
+
+        first3 = IPAddress.getText().substring( 0, IPAddress.getText().lastIndexOf('.'));
+        first2 = first3.substring( 0, first3.lastIndexOf('.'));
+        first1 = first2.substring( 0, first2.lastIndexOf('.'));
+
+        firstPart = first1;
+        secondPart = first2.substring(firstPart.length() + 1);
+        thirdPart = first3.substring(first2.length() + 1);
+        fourthPart = IPAddress.getText().substring(first3.length() + 1);
+
+        if(isClassC == true) {
+            IPAddress.setText(firstPart + "." + secondPart + "." + thirdPart + ".0");
+        } else if(isClassB == true) {
+            IPAddress.setText(firstPart + "." + secondPart + ".0.0");
+        } else {
+            IPAddress.setText(firstPart + ".0.0.0");
+        }
+
+        System.out.println("\n\nAdaptation Done: true");
+        System.out.println("--Completed--");
+    }
+
+    private void calculator() {
         ID = 0;
         address = 0;
+        int subnetCounter = 0;
 
         firstPart = IPAddress.getText().substring( 0, IPAddress.getText().lastIndexOf('.'));
         secondPart = IPAddress.getText().substring( 0, firstPart.lastIndexOf('.'));
         thirdPart = IPAddress.getText().substring( 0, secondPart.lastIndexOf('.'));
+
+        System.out.println("\n\nCALCULATOR STATUS");
 
         if(isClassC == true) {
             // firstPart = IPAddress.getText().substring( 0, 6 + IPAddress.getText().indexOf('.'));
             do {
                 ID++;
 
+                System.out.println("test");
                 firstHostRange = address + 1;
                 lastHostRange = (address + Integer.parseInt(hostsNumber.getValue())) - 2;
 
@@ -259,7 +275,10 @@ public class CalculatorController {
                 table.setItems(list);
 
                 address += Integer.parseInt(hostsNumber.getValue());
-            } while(address <= 255);
+                System.out.println(address);
+
+                subnetCounter++;
+            } while(address <= 255 && subnetCounter != Integer.parseInt(subnetsNumber.getValue()));
         }
         else if(isClassB == true) {
             // firstPart = IPAddress.getText().substring(0, 2 + IPAddress.getText().indexOf('.'));
@@ -303,7 +322,8 @@ public class CalculatorController {
                     address++;
                 }
                 tObject = new Table(ID, secondPart + "." + address + "." + address2, secondPart + "." + firstHostRange  + "." + address2 + " - " + secondPart + "." + lastHostRange + "." + address2, secondPart + "." + broadcast + "." + address2);
-            } while(address <= 255);
+                subnetCounter++;
+            } while(address <= 255 && subnetCounter != Integer.parseInt(subnetsNumber.getValue()));
         }
         else {
             do {
@@ -373,6 +393,187 @@ public class CalculatorController {
 
                 // tObject = new Table(ID, thirdPart + "." + address + "." + address2, thirdPart + "." + firstHostRange  + "." + address2 + " - " + thirdPart + "." + lastHostRange + "." + address2, thirdPart + "." + broadcast + "." + address2);
 
+        }
+        System.out.println("\n\nCalculation Done: true");
+        System.out.println("--Completed--");
+    }
+
+    private void controller() {
+
+        verify = false;
+        count = 0;
+
+        IPAddress.setText(IPAddress.getText().replaceAll("[^\\d.]", ""));
+
+        System.out.println("\n\nCONTROLLER STATUS");
+
+        if (Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 192) {
+            System.out.println("Class: C");
+
+            cidr.getItems().setAll(cidrC);
+            if(Integer.parseInt(cidr.getValue()) < 24)
+                cidr.setValue("24");
+
+            hostsNumber.getItems().setAll(classC);
+            if(Integer.parseInt(hostsNumber.getValue()) > 256)
+                hostsNumber.setValue("256");
+
+            subnetsNumber.getItems().setAll(classC);
+            if(Integer.parseInt(subnetsNumber.getValue()) > 256)
+            subnetsNumber.setValue("256");
+
+            isClassC = true;
+            isClassB = false;
+            isClassA = false;
+        } else if (Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 128) {
+            System.out.println("Class: B");
+
+            cidr.getItems().setAll(cidrB);
+            if(Integer.parseInt(cidr.getValue()) < 16)
+                cidr.setValue("16");
+
+            hostsNumber.getItems().setAll(classB);
+            if(Integer.parseInt(hostsNumber.getValue()) > 65536)
+                hostsNumber.setValue("65536");
+
+            subnetsNumber.getItems().setAll(classB);
+            if(Integer.parseInt(subnetsNumber.getValue()) > 65536)
+                subnetsNumber.setValue("65536");
+
+            isClassC = false;
+            isClassB = true;
+            isClassA = false;
+        } else if (Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 1) {
+            System.out.println("Class: A");
+
+            cidr.getItems().setAll(cidrA);
+            if(Integer.parseInt(cidr.getValue()) < 8)
+            cidr.setValue("8");
+
+            hostsNumber.getItems().setAll(classA);
+            if(Integer.parseInt(hostsNumber.getValue()) > 16777216)
+                hostsNumber.setValue("16777216");
+
+            subnetsNumber.getItems().setAll(classA);
+            if(Integer.parseInt(subnetsNumber.getValue()) > 16777216)
+                subnetsNumber.setValue("16777216");
+
+            isClassC = false;
+            isClassB = false;
+            isClassA = true;
+        }
+
+        if(IPAddress.getText().length() > 0) {
+            System.out.println("Not Empty: true");
+
+                for (int i = 0; i < IPAddress.getText().length(); i++) {
+                    if (IPAddress.getText().charAt(i) == '.') {
+                        if(i + 1  <= IPAddress.getText().length()) {
+                            if(i + 1 != IPAddress.getText().length()) {
+                                if (IPAddress.getText().charAt(i + 1) != '.')
+                                    count++;
+                            } else {
+                                count++;
+                            }
+                        }
+                    }
+                }
+
+                System.out.println("[Dot Counted: " + count + "]");
+
+                if(count == 3) {
+                    System.out.println("3 Dots: true");
+
+                    first3 = IPAddress.getText().substring( 0, IPAddress.getText().lastIndexOf('.'));
+                    first2 = first3.substring( 0, first3.lastIndexOf('.'));
+                    first1 = first2.substring( 0, first2.lastIndexOf('.'));
+
+                    firstPart = first1;
+                    secondPart = first2.substring(firstPart.length() + 1);
+                    thirdPart = first3.substring(first2.length() + 1);
+                    fourthPart = IPAddress.getText().substring(first3.length() + 1);
+                    if((firstPart.length() <= 3 && firstPart.length() >= 1) && (secondPart.length() <= 3 && secondPart.length() >= 1) && (thirdPart.length() <= 3 && thirdPart.length() >= 1) && (fourthPart.length() <= 3 && fourthPart.length() >= 1)) {
+                        System.out.println("Bytes length = true");
+                        do {
+                            first3 = IPAddress.getText().substring( 0, IPAddress.getText().lastIndexOf('.'));
+                            first2 = first3.substring( 0, first3.lastIndexOf('.'));
+                            first1 = first2.substring( 0, first2.lastIndexOf('.'));
+
+                            firstPart = first1;
+                            secondPart = first2.substring(firstPart.length() + 1);
+                            thirdPart = first3.substring(first2.length() + 1);
+                            fourthPart = IPAddress.getText().substring(first3.length() + 1);
+
+                            if (Integer.parseInt(firstPart) >= 0 && Integer.parseInt(firstPart) <= 255) {
+                                System.out.println("First Byte = true");
+                                if (Integer.parseInt(secondPart) >= 0 && Integer.parseInt(secondPart) <= 255) {
+                                    System.out.println("Second Byte = true");
+                                    if (Integer.parseInt(thirdPart) >= 0 && Integer.parseInt(thirdPart) <= 255) {
+                                        System.out.println("Third Byte = true");
+                                        if (Integer.parseInt(fourthPart) >= 0 && Integer.parseInt(fourthPart) <= 255) {
+                                            System.out.println("Fourth Byte = true");
+                                            System.out.println("Verify = true");
+                                            System.out.println("--Completed--");
+                                            verify = true;
+                                        } else {
+                                            System.out.println("Fourth Byte = false");
+                                            System.out.println("Incorrect Address");
+
+                                            if (Integer.parseInt(fourthPart) < 0) {
+                                                IPAddress.setText(firstPart + "." + secondPart + "." + thirdPart + ".0");
+                                            } else {
+                                                IPAddress.setText(firstPart + "." + secondPart + "." + thirdPart + ".255");
+                                            }
+                                        }
+                                    } else {
+                                        System.out.println("Third Byte = false");
+                                        System.out.println("Incorrect Address");
+
+                                        if (Integer.parseInt(thirdPart) < 0) {
+                                            IPAddress.setText(firstPart + "." + secondPart + ".0." + fourthPart);
+                                        } else {
+                                            IPAddress.setText(firstPart + "." + secondPart + ".255." + fourthPart);
+                                        }
+                                    }
+                                } else {
+                                    System.out.println("Second Byte = false");
+                                    System.out.println("Incorrect Address");
+
+                                    if (Integer.parseInt(secondPart) < 0) {
+                                        IPAddress.setText(firstPart + ".0." + thirdPart + "." + fourthPart);
+                                    } else {
+                                        IPAddress.setText(firstPart + ".255." + thirdPart + "." + fourthPart);
+                                    }
+                                }
+                            } else {
+                                System.out.println("First Byte = false");
+                                System.out.println("Incorrect Address");
+
+                                if (Integer.parseInt(firstPart) < 0) {
+                                    IPAddress.setText("0." + secondPart + "." + thirdPart + "." + fourthPart);
+                                } else {
+                                    IPAddress.setText("255." + secondPart + "." + thirdPart + "." + fourthPart);
+                                }
+                            }
+                        } while (verify == false);
+                    } else {
+                        System.out.println("Bytes length = false");
+                    }
+                } else {
+                    System.out.println("3 Dots: false");
+                    System.out.println("Incorrect Address");
+
+                    if(count == 2) {
+                        IPAddress.setText(IPAddress.getText() + ".0");
+                    } else if(count == 1) {
+                        IPAddress.setText(IPAddress.getText() + ".0.0");
+                    }
+                }
+        }
+        else {
+            System.out.println("Not Empty: false");
+            System.out.println("Incorrect Address");
+            IPAddress.setText("0.0.0.0");
         }
     }
 }
