@@ -15,7 +15,9 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 import java.util.Vector;
 
 public class CalculatorController {
@@ -59,20 +61,27 @@ public class CalculatorController {
     @FXML
     private TableColumn<Table, String> c4;
 
-    private String[] cidrC = {"25", "26", "27", "28", "29", "30", "31", "32"};
+    private String[] cidrC = {"24", "25", "26", "27", "28", "29", "30"};
 
-    private String[] cidrB = {"17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32"};
+    private String[] cidrB = {"16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"};
 
-    private String[] cidrA = {"9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
-            "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32"};
+    private String[] cidrA = {"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
+            "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"};
 
-    private String[] classC = {"1", "2", "4", "8", "16", "32", "64", "128", "256"};
+    private String[] hostsClassC = {"2", "6", "14", "30", "62", "126", "254"};
 
-    private String[] classB = {"1", "2", "4", "8", "16", "32", "64", "128", "256", "1024", "2048", "4096", "8192",
-            "16384", "32768", "65536"};
+    private String[] hostsClassB = {"2", "6", "14", "30", "62", "126", "254", "1022", "2046", "4094", "8190",
+            "16382", "32766", "65534"};
 
-    private String[] classA = {"1", "2", "4", "8", "16", "32", "64", "128", "256", "1024", "2048", "4096", "8192",
-            "16384", "32768", "65536", "131072", "262144", "524288", "1048576", "2097152", "4194304", "8388608", "16777216"};
+    private String[] hostsClassA = {"2", "6", "14", "30", "62", "126", "254", "1022", "2046", "4094", "8190",
+            "16382", "32766", "65534", "131070", "262142", "524286", "1048574", "2097150", "4194302", "8388606", "16777214"};
+
+    private String[] subnetsClassC = {"1", "2", "4", "8", "16", "32", "64"};
+
+    private String[] subnetsClassB = {"1", "2", "4", "8", "16", "32", "64", "128", "256", "1024", "2048", "4096", "8192", "16384"};
+
+    private String[] subnetsClassA = {"1", "2", "4", "8", "16", "32", "64", "128", "256", "1024", "2048", "4096", "8192",
+            "16384", "32768", "65536", "131072", "262144", "524288", "1048576", "2097152", "4194304"};
 
     private double x, y;
 
@@ -80,20 +89,18 @@ public class CalculatorController {
 
     ObservableList<Table> list;
 
-    private boolean isClassA = false, isClassB = false, isClassC = false, verify = false;
+    private boolean isClassA = false, isClassB = false, isClassC = false, controllerVerifier = false, adapterVerifier = false, firstTime = true, submitVerifier;
 
-    private int ID, address, address2, address3, firstHostRange, lastHostRange, broadcast, count;
+    private int ID, address, address2, address3, firstHostRange, lastHostRange, broadcast, count, numberOfIP;
 
-    private String firstPart, secondPart, thirdPart, fourthPart, first1, first2, first3;
+    private String firstPart, secondPart, thirdPart, fourthPart, first1, first2, first3, lastIP, lastMaskBits, lastHostsNumber, lastSubnetsNumber;
 
-    private boolean submitVerify;
-
-    /*public void enable(MouseEvent e) {
+    /* public void enable(MouseEvent e) {
         if(e.getTarget() == vlsmMode)
             addButton.setEnabled(true);
         else if(e.getTarget() == flsmMode)
             addButton.setEnabled(false);
-    }*/
+    } */
 
 
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -114,16 +121,18 @@ public class CalculatorController {
         settingsLabel.setVisible(false);
         addBtn.setVisible(false);
 
-        cidr.getItems().addAll(cidrC);
-        cidr.setValue("0");
+        cidr.getItems().setAll(cidrA);
+        cidr.setValue("8");
 
-        hostsNumber.getItems().addAll(classC);
-        hostsNumber.setValue("0");
+        hostsNumber.getItems().setAll(hostsClassA);
+        hostsNumber.setValue("16777214");
 
-        subnetsNumber.getItems().addAll(classC);
-        subnetsNumber.setValue("0");
+        subnetsNumber.getItems().setAll(subnetsClassA);
+        subnetsNumber.setValue("1");
 
-        IPAddress.setText("0.0.0.0");
+        IPAddress.setText("10.0.0.0");
+
+        Scanner text = new Scanner(System.in);
 
         c1.setCellValueFactory(new PropertyValueFactory<Table, String>("c1"));
         c2.setCellValueFactory(new PropertyValueFactory<Table, String>("c2"));
@@ -155,8 +164,9 @@ public class CalculatorController {
                 if(keyEvent.getCode() == KeyCode.ENTER) {
                     controller();
 
-                    if(verify == true)
-                        adapter();
+                    if(controllerVerifier == true)
+                        if(lastIP != IPAddress.getText())
+                            adapter();
                 }
             }
         });
@@ -182,17 +192,23 @@ public class CalculatorController {
         });
 
         reset.setOnMouseClicked(mouseEvent -> {
+            if(submitVerifier == true) {
                 list.clear();
-                submitVerify = false;
+                submitVerifier = false;
+            }
         });
 
         submit.setOnMouseClicked(mouseEvent -> {
                 controller();
-                adapter();
 
-                if(verify == true) {
+                if(lastIP != IPAddress.getText())
+                    adapter();
+
+                if(controllerVerifier == true) {
                     calculator();
-                    submitVerify = true;
+                    lastIP = IPAddress.getText();
+                    submitVerifier = true;
+                    firstTime = false;
 
                     fieldFrame.setVisible(false);
                     addressFrame.setVisible(true);
@@ -200,15 +216,115 @@ public class CalculatorController {
                 }
         });
 
-        // PARTE DEL CONTROLLO AUTOMATICO
-        /*cidr.setOnAction(actionEvent -> {
-            switch(cidr.getValue()) {
-                case 1:
-                    if(Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 192) {
+        cidr.setOnMouseClicked(mouseEvent -> {
+            controller();
 
-                    }
+            if(controllerVerifier == true) {
+                adapter();
+
+                /* switch(Integer.parseInt(cidr.getValue())) {
+                    case 8:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 9:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 10:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 11:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 12:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 13:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 14:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 15:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 16:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 17:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 18:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 19:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 20:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 21:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 22:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 23:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 24:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 25:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 26:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 27:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 28:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 29:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 30:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 31:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+
+                    case 32:
+                        subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
+                        break;
+                } */
             }
-        }); */
+        });
 
         titlePane.setOnMousePressed(mouseEvent -> {
             x = mouseEvent.getSceneX();
@@ -235,6 +351,98 @@ public class CalculatorController {
         thirdPart = first3.substring(first2.length() + 1);
         fourthPart = IPAddress.getText().substring(first3.length() + 1);
 
+        System.out.println("\n\nADAPTER STATUS");
+
+        if (Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 192) {
+            System.out.println("Class: C");
+
+            lastMaskBits = cidr.getValue();
+            cidr.getItems().setAll(cidrC);
+            cidr.setValue(lastMaskBits);
+
+            if(Integer.parseInt(cidr.getValue()) < 24)
+                cidr.setValue("24");
+
+            lastHostsNumber = hostsNumber.getValue();
+            hostsNumber.getItems().setAll(hostsClassC);
+            hostsNumber.setValue(lastHostsNumber);
+
+            if(Integer.parseInt(hostsNumber.getValue()) > 256)
+                hostsNumber.setValue("254");
+
+            lastSubnetsNumber = subnetsNumber.getValue();
+            subnetsNumber.getItems().setAll(subnetsClassC);
+            subnetsNumber.setValue(lastSubnetsNumber);
+
+            if(Integer.parseInt(subnetsNumber.getValue()) > 256)
+                subnetsNumber.setValue("256");
+
+            isClassC = true;
+            isClassB = false;
+            isClassA = false;
+        } else if (Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 128) {
+            System.out.println("Class: B");
+
+            lastMaskBits = cidr.getValue();
+            cidr.getItems().setAll(cidrB);
+            cidr.setValue(lastMaskBits);
+
+            if(Integer.parseInt(cidr.getValue()) < 16)
+                cidr.setValue("16");
+
+            lastHostsNumber = hostsNumber.getValue();
+            hostsNumber.getItems().setAll(hostsClassB);
+            hostsNumber.setValue(lastHostsNumber);
+
+            if(Integer.parseInt(hostsNumber.getValue()) > 65536)
+                hostsNumber.setValue("65536");
+
+            lastSubnetsNumber = subnetsNumber.getValue();
+            subnetsNumber.getItems().setAll(subnetsClassB);
+            subnetsNumber.setValue(lastSubnetsNumber);
+
+            if(Integer.parseInt(subnetsNumber.getValue()) > 65536)
+                subnetsNumber.setValue("65536");
+
+            isClassC = false;
+            isClassB = true;
+            isClassA = false;
+        } else if (Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 1) {
+            System.out.println("Class: A");
+
+            lastMaskBits = cidr.getValue();
+
+            cidr.getItems().setAll(cidrA);
+
+            cidr.setValue(lastMaskBits);
+
+            if(Integer.parseInt(cidr.getValue()) < 8)
+                cidr.setValue("8");
+
+            lastHostsNumber = hostsNumber.getValue();
+
+            hostsNumber.getItems().setAll(hostsClassA);
+
+            hostsNumber.setValue(lastHostsNumber);
+
+            if(Integer.parseInt(hostsNumber.getValue()) > 16777216)
+                hostsNumber.setValue("16777216");
+
+            lastSubnetsNumber = subnetsNumber.getValue();
+
+            subnetsNumber.getItems().setAll(subnetsClassA);
+
+            subnetsNumber.setValue(lastSubnetsNumber);
+
+            if(Integer.parseInt(subnetsNumber.getValue()) > 16777216)
+                subnetsNumber.setValue("16777216");
+
+            isClassC = false;
+            isClassB = false;
+            isClassA = true;
+
+        }
+
         if(isClassC == true) {
             IPAddress.setText(firstPart + "." + secondPart + "." + thirdPart + ".0");
         } else if(isClassB == true) {
@@ -243,11 +451,15 @@ public class CalculatorController {
             IPAddress.setText(firstPart + ".0.0.0");
         }
 
-        System.out.println("\n\nAdaptation Done: true");
+        System.out.println("Adaptation Done: true");
         System.out.println("--Completed--");
     }
 
     private void calculator() {
+        if(submitVerifier == true) {
+            list.clear();
+            submitVerifier = false;
+        }
         ID = 0;
         address = 0;
         int subnetCounter = 0;
@@ -258,14 +470,17 @@ public class CalculatorController {
 
         System.out.println("\n\nCALCULATOR STATUS");
 
+        numberOfIP = Integer.parseInt(hostsNumber.getValue()) + 2;
+
         if(isClassC == true) {
+            // Class C ------------------------------------------------------------------------------------------
             // firstPart = IPAddress.getText().substring( 0, 6 + IPAddress.getText().indexOf('.'));
             do {
                 ID++;
 
                 System.out.println("test");
                 firstHostRange = address + 1;
-                lastHostRange = (address + Integer.parseInt(hostsNumber.getValue())) - 2;
+                lastHostRange = (address + numberOfIP) - 2;
 
                 broadcast = lastHostRange + 1;
                 tObject = new Table (ID, firstPart + "." + address, firstPart + "." + firstHostRange + " - " + firstPart + "." + lastHostRange, firstPart + "." + broadcast);
@@ -274,23 +489,24 @@ public class CalculatorController {
                 list.add(tObject);
                 table.setItems(list);
 
-                address += Integer.parseInt(hostsNumber.getValue());
+                address += numberOfIP;
                 System.out.println(address);
 
                 subnetCounter++;
             } while(address <= 255 && subnetCounter != Integer.parseInt(subnetsNumber.getValue()));
         }
         else if(isClassB == true) {
+            // Class B ------------------------------------------------------------------------------
             // firstPart = IPAddress.getText().substring(0, 2 + IPAddress.getText().indexOf('.'));
 
             do {
-                if(Integer.parseInt(hostsNumber.getValue()) >= 256) {
+                if(numberOfIP >= 256) {
                     ID++;
                     firstHostRange = address + 1;
 
-                    lastHostRange = (address + (Integer.parseInt(hostsNumber.getValue())) / 256) - 1;
+                    lastHostRange = (address + (numberOfIP) / 256) - 1;
 
-                    broadcast = (address + (Integer.parseInt(hostsNumber.getValue())) / 256) - 1;
+                    broadcast = (address + (numberOfIP) / 256) - 1;
 
                     tObject = new Table(ID, secondPart + "." + address +".0", secondPart + "." + address +".1" + " - " + secondPart + "." + lastHostRange + ".254", secondPart + "." + broadcast + ".255");
 
@@ -298,7 +514,7 @@ public class CalculatorController {
                     list.add(tObject);
                     table.setItems(list);
 
-                    address += Integer.parseInt(hostsNumber.getValue()) / 256;
+                    address += numberOfIP / 256;
                 }
                 else {
                     address2 = 0;
@@ -307,7 +523,7 @@ public class CalculatorController {
 
                         firstHostRange = address2 + 1;
 
-                        lastHostRange = (address2 + Integer.parseInt(hostsNumber.getValue())) - 2;
+                        lastHostRange = (address2 + numberOfIP) - 2;
 
                         broadcast = lastHostRange + 1;
 
@@ -317,7 +533,7 @@ public class CalculatorController {
                         list.add(tObject);
                         table.setItems(list);
 
-                        address2 += Integer.parseInt(hostsNumber.getValue());
+                        address2 += numberOfIP;
                     } while (address2 <= 255);
                     address++;
                 }
@@ -326,33 +542,35 @@ public class CalculatorController {
             } while(address <= 255 && subnetCounter != Integer.parseInt(subnetsNumber.getValue()));
         }
         else {
+            // Class A --------------------------------------------------------
+            System.out.println(numberOfIP);
             do {
-                if(Integer.parseInt(hostsNumber.getValue()) >= 65536) {
+                if(numberOfIP >= 65536) {
                     ID++;
                     firstHostRange = address + 1;
 
-                    lastHostRange = (address + (Integer.parseInt(hostsNumber.getValue())) / 65536) - 1;
+                    lastHostRange = (address + (numberOfIP) / 65536) - 1;
 
-                    broadcast = (address + (Integer.parseInt(hostsNumber.getValue())) / 65536) - 1;
+                    broadcast = (address + (numberOfIP) / 65536) - 1;
 
-                    tObject = new Table(ID, thirdPart + "." + address +".0.0", thirdPart + "." + address +".0.1" + " - " + thirdPart + "." + lastHostRange + ".255.254", thirdPart + "." + broadcast + ".255.255");
+                    tObject = new Table(ID, thirdPart + "." + address +".0.0", thirdPart + "." + address +".0.1" + " - " + thirdPart + "." + lastHostRange + ".255.254", thirdPart + "." + lastHostRange + ".255.255");
 
                     list = table.getItems();
                     list.add(tObject);
                     table.setItems(list);
 
-                    address += Integer.parseInt(hostsNumber.getValue()) / 65536;
+                    address += numberOfIP / 65536;
                 }
-                else if(Integer.parseInt(hostsNumber.getValue()) >= 256) {
+                else if(numberOfIP >= 256) {
                             address2 = 0;
                             do {
                                 ID++;
 
                                 firstHostRange = address2 + 1;
 
-                                lastHostRange = (address2 + (Integer.parseInt(hostsNumber.getValue())) / 256) - 1;
+                                lastHostRange = (address2 + (numberOfIP) / 256) - 1;
 
-                                broadcast = (address2 + (Integer.parseInt(hostsNumber.getValue())) / 256) - 1;
+                                broadcast = (address2 + (numberOfIP) / 256) - 1;
 
                                 tObject = new Table(ID, thirdPart + "." + address + "." + address2 + ".0", thirdPart + "." + address + "." + address2 + ".1" + " - " + thirdPart + "." + address + "." + lastHostRange + ".254", thirdPart + "." + address + "." + broadcast + ".255");
 
@@ -360,7 +578,7 @@ public class CalculatorController {
                                 list.add(tObject);
                                 table.setItems(list);
 
-                                address2 += Integer.parseInt(hostsNumber.getValue()) / 256;
+                                address2 += numberOfIP / 256;
                             } while (address2 <= 255);
                             address++;
                 }
@@ -373,7 +591,7 @@ public class CalculatorController {
 
                             firstHostRange = address2 + 1;
 
-                            lastHostRange = Integer.parseInt(hostsNumber.getValue()) + address2 - 2;
+                            lastHostRange = numberOfIP + address2 - 2;
 
                             broadcast = lastHostRange + 1;
 
@@ -383,85 +601,29 @@ public class CalculatorController {
                             list.add(tObject);
                             table.setItems(list);
 
-                            address2 += Integer.parseInt(hostsNumber.getValue());
+                            address2 += numberOfIP;
                         } while (address2 <= 255);
                         address3++;
                     } while(address3 <= 255);
                     address++;
                 }
-                } while(address <= 255);
+                } while(address <= 255 && subnetCounter != Integer.parseInt(subnetsNumber.getValue()));
 
                 // tObject = new Table(ID, thirdPart + "." + address + "." + address2, thirdPart + "." + firstHostRange  + "." + address2 + " - " + thirdPart + "." + lastHostRange + "." + address2, thirdPart + "." + broadcast + "." + address2);
 
         }
-        System.out.println("\n\nCalculation Done: true");
+        System.out.println("Calculation Done: true");
         System.out.println("--Completed--");
     }
 
     private void controller() {
 
-        verify = false;
+        controllerVerifier = false;
         count = 0;
 
         IPAddress.setText(IPAddress.getText().replaceAll("[^\\d.]", ""));
 
         System.out.println("\n\nCONTROLLER STATUS");
-
-        if (Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 192) {
-            System.out.println("Class: C");
-
-            cidr.getItems().setAll(cidrC);
-            if(Integer.parseInt(cidr.getValue()) < 24)
-                cidr.setValue("24");
-
-            hostsNumber.getItems().setAll(classC);
-            if(Integer.parseInt(hostsNumber.getValue()) > 256)
-                hostsNumber.setValue("256");
-
-            subnetsNumber.getItems().setAll(classC);
-            if(Integer.parseInt(subnetsNumber.getValue()) > 256)
-            subnetsNumber.setValue("256");
-
-            isClassC = true;
-            isClassB = false;
-            isClassA = false;
-        } else if (Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 128) {
-            System.out.println("Class: B");
-
-            cidr.getItems().setAll(cidrB);
-            if(Integer.parseInt(cidr.getValue()) < 16)
-                cidr.setValue("16");
-
-            hostsNumber.getItems().setAll(classB);
-            if(Integer.parseInt(hostsNumber.getValue()) > 65536)
-                hostsNumber.setValue("65536");
-
-            subnetsNumber.getItems().setAll(classB);
-            if(Integer.parseInt(subnetsNumber.getValue()) > 65536)
-                subnetsNumber.setValue("65536");
-
-            isClassC = false;
-            isClassB = true;
-            isClassA = false;
-        } else if (Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 1) {
-            System.out.println("Class: A");
-
-            cidr.getItems().setAll(cidrA);
-            if(Integer.parseInt(cidr.getValue()) < 8)
-            cidr.setValue("8");
-
-            hostsNumber.getItems().setAll(classA);
-            if(Integer.parseInt(hostsNumber.getValue()) > 16777216)
-                hostsNumber.setValue("16777216");
-
-            subnetsNumber.getItems().setAll(classA);
-            if(Integer.parseInt(subnetsNumber.getValue()) > 16777216)
-                subnetsNumber.setValue("16777216");
-
-            isClassC = false;
-            isClassB = false;
-            isClassA = true;
-        }
 
         if(IPAddress.getText().length() > 0) {
             System.out.println("Not Empty: true");
@@ -514,7 +676,7 @@ public class CalculatorController {
                                             System.out.println("Fourth Byte = true");
                                             System.out.println("Verify = true");
                                             System.out.println("--Completed--");
-                                            verify = true;
+                                            controllerVerifier = true;
                                         } else {
                                             System.out.println("Fourth Byte = false");
                                             System.out.println("Incorrect Address");
@@ -555,7 +717,7 @@ public class CalculatorController {
                                     IPAddress.setText("255." + secondPart + "." + thirdPart + "." + fourthPart);
                                 }
                             }
-                        } while (verify == false);
+                        } while (controllerVerifier == false);
                     } else {
                         System.out.println("Bytes length = false");
                     }
