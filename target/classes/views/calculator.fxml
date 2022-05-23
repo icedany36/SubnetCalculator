@@ -2,6 +2,7 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXDialog?>
 <?import com.jfoenix.controls.JFXRadioButton?>
 <?import java.net.URL?>
 <?import javafx.scene.Cursor?>
@@ -16,11 +17,17 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="mainFrame" prefHeight="480.0" prefWidth="720.0" stylesheets="@../values/style.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.CalculatorController">
    <children>
+      <StackPane fx:id="stackPane" prefHeight="480.0" prefWidth="720.0">
+         <children>
+            <JFXDialog cacheContainer="true" />
+         </children>
+      </StackPane>
       <Pane fx:id="titlePane" prefHeight="60.0" prefWidth="725.0" AnchorPane.topAnchor="0.0">
          <children>
             <Label fx:id="subnetsLabel" layoutX="75.0" layoutY="18.0" stylesheets="@../values/bold.css" text="SUBNETS LIST (CTRL+2)">

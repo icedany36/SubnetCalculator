@@ -1,5 +1,7 @@
 package Controller;
 
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,6 +21,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.awt.*;
@@ -34,6 +37,9 @@ public class CalculatorController implements EventHandler<KeyEvent> {
 
     @FXML
     private Pane titlePane;
+
+    @FXML
+    private JFXDialog dialog;
 
     @FXML
     private ImageView btnMinimize, btnClose, firstPage, secondPage, thirdPage;
@@ -70,6 +76,14 @@ public class CalculatorController implements EventHandler<KeyEvent> {
 
     @FXML
     private TableColumn<Table, String> c4;
+
+    @FXML
+    private StackPane stackPane;
+
+    @FXML
+    private JFXButton accept
+
+    private Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 
     private String[] cidrC = {"24", "25", "26", "27", "28", "29", "30"};
 
@@ -138,6 +152,8 @@ public class CalculatorController implements EventHandler<KeyEvent> {
         addBtn.setVisible(false);
         inputLabel.setVisible(true);
         reset.setVisible(false);
+        // dialog.setTransitionType(JFXDialog.DialogTransition.TOP);
+        // dialog.setDialogContainer(stackPane); //TODO
 
         cidr.getItems().setAll(cidrA);
         cidr.setValue("8");
@@ -176,8 +192,11 @@ public class CalculatorController implements EventHandler<KeyEvent> {
             settingsLabel.setVisible(false);
         });
 
+        // SHORTCUTS -----------------------------------------------------------------------------------------------
         stage.getScene().setOnKeyPressed(keyEvent -> {
             if(short1.match(keyEvent)) {
+                alert.showAndWait();
+                // dialog.show(); //TODO
                 currentPage = 1;
 
                 settingsLabel.setVisible(false);
