@@ -1,0 +1,12 @@
+.label{
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.button{
+    -fx-font-weight: bold;
+}
+
+#cidr{
+    -fx-text-fill: white;
+}

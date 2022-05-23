@@ -1,3 +1,18 @@
+#cidr {
+    -fx-background-color: white;
+    -fx-font-size: 15px;
+}
+
+#hostsNumber{
+    -fx-background-color: white;
+    -fx-font-size: 15px;
+}
+
+#subnetsNumber{
+    -fx-background-color: white;
+    -fx-font-size: 15px;
+}
+
 .label {
--fx-text-fill: white;
+    -fx-text-fill: whitesmoke;
 }

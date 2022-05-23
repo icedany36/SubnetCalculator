@@ -5,22 +5,32 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.Vector;
 
-public class CalculatorController {
+public class CalculatorController implements EventHandler<KeyEvent> {
 
     @FXML
     private Pane titlePane;
@@ -44,7 +54,7 @@ public class CalculatorController {
     private TextField IPAddress;
 
     @FXML
-    private ChoiceBox<String> cidr, hostsNumber, subnetsNumber;
+    private ComboBox<String> cidr, hostsNumber, subnetsNumber;
 
     @FXML
     private TableView<Table> table;
@@ -87,13 +97,19 @@ public class CalculatorController {
 
     Table tObject;
 
+    KeyCombination short1 = new KeyCodeCombination(KeyCode.DIGIT1, KeyCodeCombination.CONTROL_DOWN);
+    KeyCombination short2 = new KeyCodeCombination(KeyCode.DIGIT2, KeyCodeCombination.CONTROL_DOWN);
+    KeyCombination short3 = new KeyCodeCombination(KeyCode.DIGIT3, KeyCodeCombination.CONTROL_DOWN);
+    KeyCombination shortCalc = new KeyCodeCombination(KeyCode.C, KeyCodeCombination.SHIFT_DOWN);
+    KeyCombination shortReset = new KeyCodeCombination(KeyCode.R, KeyCodeCombination.SHIFT_DOWN);
+
     ObservableList<Table> list;
 
     private boolean isClassA = false, isClassB = false, isClassC = false, controllerVerifier = false, adapterVerifier = false, firstTime = true, submitVerifier;
 
-    private int ID, address, address2, address3, firstHostRange, lastHostRange, broadcast, count, numberOfIP;
+    private int ID, address, address2, address3, firstHostRange, lastHostRange, broadcast, count, numberOfIP, currentPage = 1;
 
-    private String firstPart, secondPart, thirdPart, fourthPart, first1, first2, first3, lastIP, lastMaskBits, lastHostsNumber, lastSubnetsNumber;
+    private String firstPart, secondPart, thirdPart, fourthPart, first1, first2, first3, lastIP = "", lastMaskBits, lastHostsNumber, lastSubnetsNumber;
 
     /* public void enable(MouseEvent e) {
         if(e.getTarget() == vlsmMode)
@@ -120,6 +136,8 @@ public class CalculatorController {
         subnetsLabel.setVisible(false);
         settingsLabel.setVisible(false);
         addBtn.setVisible(false);
+        inputLabel.setVisible(true);
+        reset.setVisible(false);
 
         cidr.getItems().setAll(cidrA);
         cidr.setValue("8");
@@ -132,30 +150,106 @@ public class CalculatorController {
 
         IPAddress.setText("10.0.0.0");
 
-        Scanner text = new Scanner(System.in);
-
         c1.setCellValueFactory(new PropertyValueFactory<Table, String>("c1"));
         c2.setCellValueFactory(new PropertyValueFactory<Table, String>("c2"));
         c3.setCellValueFactory(new PropertyValueFactory<Table, String>("c3"));
         c4.setCellValueFactory(new PropertyValueFactory<Table, String>("c4"));
 
+        // cidr.setStyle(" -fx-background-color: #FFFFFF");
+
         // FINE SETTINGS INIZIALI ------------------------------------------------------------------------------------------------------------
 
-        thirdPage.setOnMouseExited(mouseEvent -> settingsLabel.setVisible(false));
-        thirdPage.setOnMouseEntered(mouseEvent -> settingsLabel.setVisible(true));
 
-        secondPage.setOnMouseExited(mouseEvent -> subnetsLabel.setVisible(false));
-        secondPage.setOnMouseEntered(mouseEvent -> subnetsLabel.setVisible(true));
+        thirdPage.setOnMouseExited(mouseEvent -> labelController());
+        thirdPage.setOnMouseEntered(mouseEvent -> {
+            inputLabel.setVisible(false);
+            subnetsLabel.setVisible(false);
+            settingsLabel.setVisible(true);
+        });
 
-        firstPage.setOnMouseExited(mouseEvent -> inputLabel.setVisible(false));
-        firstPage.setOnMouseEntered(mouseEvent -> inputLabel.setVisible(true));
+        secondPage.setOnMouseExited(mouseEvent ->
+            labelController()
+        );
+        secondPage.setOnMouseEntered(mouseEvent -> {
+            inputLabel.setVisible(false);
+            subnetsLabel.setVisible(true);
+            settingsLabel.setVisible(false);
+        });
+
+        stage.getScene().setOnKeyPressed(keyEvent -> {
+            if(short1.match(keyEvent)) {
+                currentPage = 1;
+
+                settingsLabel.setVisible(false);
+                inputLabel.setVisible(true);
+                subnetsLabel.setVisible(false);
+
+                fieldFrame.setVisible(true);
+                addressFrame.setVisible(false);
+                settingsFrame.setVisible(false);
+            } else if(short2.match(keyEvent)) {
+                currentPage = 2;
+
+                settingsLabel.setVisible(false);
+                inputLabel.setVisible(false);
+                subnetsLabel.setVisible(true);
+
+                fieldFrame.setVisible(false);
+                addressFrame.setVisible(true);
+                settingsFrame.setVisible(false);
+
+            } else if(short3.match(keyEvent)) {
+                currentPage = 3;
+
+                settingsLabel.setVisible(true);
+                inputLabel.setVisible(false);
+                subnetsLabel.setVisible(false);
+
+                fieldFrame.setVisible(false);
+                addressFrame.setVisible(false);
+                settingsFrame.setVisible(true);
+            } else if(shortCalc.match(keyEvent)) {
+                controller();
+
+                if(!lastIP.contains(IPAddress.getText()) || lastHostsNumber.contains(hostsNumber.getValue()) || lastSubnetsNumber.contains(subnetsNumber.getValue()) || lastMaskBits.contains(cidr.getValue()) && controllerVerifier == true) {
+                    adapter();
+                    calculator();
+
+                    lastIP = IPAddress.getText();
+                    submitVerifier = true;
+                    firstTime = false;
+
+                    fieldFrame.setVisible(false);
+                    addressFrame.setVisible(true);
+                    settingsFrame.setVisible(false);
+                }
+            }
+        });
+
+        firstPage.setOnMouseExited(mouseEvent -> labelController());
+        firstPage.setOnMouseEntered(mouseEvent -> {
+            inputLabel.setVisible(true);
+            subnetsLabel.setVisible(false);
+            settingsLabel.setVisible(false);
+        });
+
+        submit.setOnMouseEntered(mouseEvent -> submit.setStyle("-fx-background-color: rgba(255, 255, 255, .100);"));
+        submit.setOnMouseExited(mouseEvent -> submit.setStyle(null));
+
+        reset.setOnMouseEntered(mouseEvent -> reset.setStyle("-fx-background-color: rgba(255, 255, 255, .100);"));
+        reset.setOnMouseExited(mouseEvent -> reset.setStyle(null));
+
+        addBtn.setOnMouseEntered(mouseEvent -> addBtn.setStyle("-fx-background-color: rgba(255, 255, 255, .100);"));
+        addBtn.setOnMouseExited(mouseEvent -> addBtn.setStyle(null));
 
         vlsmMode.setOnMouseClicked(mouseEvent -> {
             addBtn.setVisible(true);
+            reset.setVisible(true);
         });
 
         flsmMode.setOnMouseClicked(mouseEvent -> {
             addBtn.setVisible(false);
+            reset.setVisible(false);
         });
 
         IPAddress.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -164,8 +258,7 @@ public class CalculatorController {
                 if(keyEvent.getCode() == KeyCode.ENTER) {
                     controller();
 
-                    if(controllerVerifier == true)
-                        if(lastIP != IPAddress.getText())
+                    if(controllerVerifier == true && lastIP != IPAddress.getText())
                             adapter();
                 }
             }
@@ -173,19 +266,38 @@ public class CalculatorController {
 
         /*flsmMode.setOnMouseClicked(mouseEvent -> addBtn.setEnabled(false));*/
 
+
         firstPage.setOnMouseClicked(mouseEvent -> {
+            currentPage = 1;
+
+            settingsLabel.setVisible(false);
+            inputLabel.setVisible(true);
+            subnetsLabel.setVisible(false);
+
             fieldFrame.setVisible(true);
             addressFrame.setVisible(false);
             settingsFrame.setVisible(false);
         });
 
         thirdPage.setOnMouseClicked(mouseEvent -> {
+            currentPage = 3;
+
+            settingsLabel.setVisible(true);
+            inputLabel.setVisible(false);
+            subnetsLabel.setVisible(false);
+
             fieldFrame.setVisible(false);
             addressFrame.setVisible(false);
             settingsFrame.setVisible(true);
         });
 
         secondPage.setOnMouseClicked(mouseEvent -> {
+            currentPage = 2;
+
+            settingsLabel.setVisible(false);
+            inputLabel.setVisible(false);
+            subnetsLabel.setVisible(true);
+
             fieldFrame.setVisible(false);
             addressFrame.setVisible(true);
             settingsFrame.setVisible(false);
@@ -201,11 +313,10 @@ public class CalculatorController {
         submit.setOnMouseClicked(mouseEvent -> {
                 controller();
 
-                if(lastIP != IPAddress.getText())
+                if(!lastIP.contains(IPAddress.getText()) || lastHostsNumber.contains(hostsNumber.getValue()) || lastSubnetsNumber.contains(subnetsNumber.getValue()) || lastMaskBits.contains(cidr.getValue()) && controllerVerifier == true) {
                     adapter();
-
-                if(controllerVerifier == true) {
                     calculator();
+
                     lastIP = IPAddress.getText();
                     submitVerifier = true;
                     firstTime = false;
@@ -216,7 +327,7 @@ public class CalculatorController {
                 }
         });
 
-        cidr.setOnMouseClicked(mouseEvent -> {
+        /*cidr.setOnMouseClicked(mouseEvent -> { //TODO
             controller();
 
             if(controllerVerifier == true) {
@@ -322,9 +433,9 @@ public class CalculatorController {
                     case 32:
                         subnetsNumber.setValue(String.valueOf((Math.pow(2,16))));
                         break;
-                } */
+                }
             }
-        });
+        }); */
 
         titlePane.setOnMousePressed(mouseEvent -> {
             x = mouseEvent.getSceneX();
@@ -338,6 +449,26 @@ public class CalculatorController {
 
         btnClose.setOnMouseClicked(mouseEvent -> stage.close());
         btnMinimize.setOnMouseClicked(mouseEvent -> stage.setIconified(true));
+    }
+
+    private void labelController() {
+        switch(currentPage) {
+            case 1:
+                inputLabel.setVisible(true);
+                subnetsLabel.setVisible(false);
+                settingsLabel.setVisible(false);
+                break;
+            case 2:
+                inputLabel.setVisible(false);
+                subnetsLabel.setVisible(true);
+                settingsLabel.setVisible(false);
+                break;
+            case 3:
+                inputLabel.setVisible(false);
+                subnetsLabel.setVisible(false);
+                settingsLabel.setVisible(true);
+                break;
+        }
     }
 
     private void adapter() {
@@ -407,7 +538,7 @@ public class CalculatorController {
             isClassC = false;
             isClassB = true;
             isClassA = false;
-        } else if (Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 1) {
+        } else if (Integer.parseInt(IPAddress.getText().substring(0, IPAddress.getText().indexOf('.'))) >= 0) {
             System.out.println("Class: A");
 
             lastMaskBits = cidr.getValue();
@@ -737,5 +868,10 @@ public class CalculatorController {
             System.out.println("Incorrect Address");
             IPAddress.setText("0.0.0.0");
         }
+    }
+
+    @Override
+    public void handle(KeyEvent keyEvent) {
+
     }
 }
